@@ -1,0 +1,15 @@
+[Unit]
+Description=Pre-pull GitLab CI image from GHCR to warm the Docker cache
+After=docker.service network-online.target
+Wants=docker.service network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/pull-ci-image.sh
+# Never block the instance from becoming ready if the pull is slow/unavailable.
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target

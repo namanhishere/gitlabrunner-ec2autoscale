@@ -1,0 +1,54 @@
+# Two services:
+#   toolbox - dev container (AWS CLI, Terraform, Packer, Git) for bootstrap,
+#             AMI builds, and Terraform. Uses the host's mounted ~/.aws creds.
+#             Run:  docker compose run --rm toolbox
+#   runner  - the long-running GitLab Runner manager (docker-autoscaler -> EC2).
+#             Run:  docker compose up -d runner
+
+services:
+  toolbox:
+    build:
+      context: ./toolbox
+    image: gitlabrunner-ec2autoscale-toolbox:local
+    working_dir: /workspace
+    # Only region/profile are passed through; actual credentials come from the
+    # mounted ~/.aws, isolated from the host shell and from the runner's creds.
+    environment:
+      AWS_PROFILE: ${AWS_PROFILE:-default}
+      AWS_REGION: ${AWS_REGION:-eu-west-1}
+    volumes:
+      - .:/workspace
+      - ${HOME}/.aws:/root/.aws
+    # No restart / no daemon: this is a one-shot interactive shell.
+
+  runner:
+    image: gitlab/gitlab-runner:latest
+    container_name: gitlab-runner-ec2autoscale
+    restart: unless-stopped
+    # .env is optional so the toolbox can run before it exists (bootstrap).
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      CI_SERVER_URL: ${CI_SERVER_URL}
+      RUNNER_TOKEN: ${RUNNER_TOKEN}
+      AWS_REGION: ${AWS_REGION}
+      AWS_DEFAULT_REGION: ${AWS_REGION}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      ASG_NAME: ${ASG_NAME}
+      SSH_USER: ${SSH_USER}
+      CI_IMAGE: ${CI_IMAGE}
+      CONCURRENT: ${CONCURRENT}
+      MAX_INSTANCES: ${MAX_INSTANCES}
+      IDLE_COUNT: ${IDLE_COUNT}
+      IDLE_TIME: ${IDLE_TIME}
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
+    volumes:
+      # Persist generated config.toml + system_id across restarts.
+      - ./docker/config:/etc/gitlab-runner
+      # Startup script and config template (read-only).
+      - ./docker/entrypoint.sh:/entrypoint.sh:ro
+      - ./docker/config.toml.tpl:/config.toml.tpl:ro
+      # Private SSH key that matches the EC2 key pair (from Terraform output).
+      - ./secrets/ec2-key.pem:/home/gitlab-runner/.ssh/ec2-key.pem:ro

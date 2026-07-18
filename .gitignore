@@ -1,0 +1,26 @@
+# Secrets & local config
+.env
+secrets/
+docker/config/
+
+# SSH keys
+*.pem
+*.key
+
+# Packer
+packer/*.pkrvars.hcl
+packer/manifest.json
+packer/packer_cache/
+
+# Terraform
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+terraform/terraform.tfvars
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json

@@ -1,0 +1,13 @@
+# Copy to gitlab-runner.pkrvars.hcl and adjust, then:
+#   packer init .
+#   packer build -var-file=gitlab-runner.pkrvars.hcl .
+
+region        = "eu-west-1"
+instance_type = "t3.medium"
+
+# The public CI image on GitHub Container Registry to bake + refresh on boot.
+ci_image = "ghcr.io/OWNER/IMAGE:latest"
+
+# Optional:
+# ami_name_prefix = "gitlab-runner-ec2autoscale"   # Terraform finds the AMI by this prefix
+# ssh_username    = "ec2-user"

@@ -1,0 +1,17 @@
+# Copy to terraform.tfvars and adjust. terraform.tfvars is git-ignored.
+
+region        = "eu-west-1"
+instance_type = "t3.medium"
+max_instances = 10
+
+# REQUIRED: CIDR allowed to SSH into job instances.
+# Use the public IP of the host running docker compose, as a /32.
+# Find it with:  curl -s https://checkip.amazonaws.com
+manager_cidr = "203.0.113.10/32"
+
+# Optional:
+# name_prefix      = "gitlab-runner-ec2autoscale"
+# root_volume_size = 30
+# ssh_user         = "ec2-user"
+# subnet_ids       = ["subnet-aaaa", "subnet-bbbb"]  # default: all default-VPC subnets
+# tags             = { Environment = "ci" }

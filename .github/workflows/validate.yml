@@ -1,0 +1,44 @@
+name: Validate
+
+# Lightweight checks on the IaC and shell scripts. No AWS credentials required.
+
+on:
+  pull_request: {}
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: terraform fmt
+        run: terraform -chdir=terraform fmt -check -recursive
+      - name: terraform init (no backend)
+        run: terraform -chdir=terraform init -backend=false
+      - name: terraform validate
+        run: terraform -chdir=terraform validate
+
+  packer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-packer@v3
+      - name: packer init
+        run: packer init packer/
+      - name: packer fmt
+        run: packer fmt -check packer/
+      - name: packer validate
+        # Uses example vars just to satisfy required variables; no AWS calls.
+        run: packer validate -var-file=packer/gitlab-runner.pkrvars.hcl.example packer/
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        run: |
+          sudo apt-get update && sudo apt-get install -y shellcheck
+          shellcheck docker/entrypoint.sh packer/scripts/install.sh packer/files/pull-ci-image.sh

@@ -10,21 +10,7 @@ scales back down. Instances boot from a **custom AMI** (built with Packer) that 
 tooling, and the **CI image** pre-baked, so cold starts are fast. The CI image itself is
 built and published to **GHCR** by GitHub Actions.
 
-```
-GitHub Actions ──build──▶ GHCR (ci image)
-                              │ baked in
-                              ▼
-Packer ──build──▶ custom AMI ──used by──▶ ASG (min=0)
-                                              ▲  │ SSH
-docker compose (this host)                    │  ▼
-┌─────────────────────────────┐  autoscaling  ┌──────────────────────────┐
-│ runner  (docker-autoscaler) │ ──── API ────▶│ ephemeral EC2 + Docker    │
-│ toolbox (aws/tf/packer)     │               │ CI image pre-pulled       │
-└──────────────┬──────────────┘               └──────────────────────────┘
-               │ poll jobs
-               ▼
-      Self-managed GitLab (CI_SERVER_URL)
-```
+
 
 ## Repository layout
 

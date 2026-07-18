@@ -39,6 +39,9 @@ if ! command -v envsubst >/dev/null 2>&1; then
 fi
 
 # Render only the variables we control, leaving any other $ sequences intact.
+# The single-quoted list is envsubst's SHELL-FORMAT argument; the vars must NOT
+# be expanded by the shell here, so SC2016 is a false positive.
+# shellcheck disable=SC2016
 envsubst '${CONCURRENT} ${CI_SERVER_URL} ${RUNNER_TOKEN} ${MAX_INSTANCES} ${ASG_NAME} ${AWS_REGION} ${SSH_USER} ${IDLE_COUNT} ${IDLE_TIME} ${CI_IMAGE}' \
   < "${TEMPLATE}" > "${CONFIG_FILE}"
 

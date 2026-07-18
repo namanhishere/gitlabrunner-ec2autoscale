@@ -32,7 +32,11 @@ jobs:
         run: packer fmt -check packer/
       - name: packer validate
         # Uses example vars just to satisfy required variables; no AWS calls.
-        run: packer validate -var-file=packer/gitlab-runner.pkrvars.hcl.example packer/
+        # Packer only accepts var files suffixed with .hcl or .json, so copy the
+        # example to a valid filename first.
+        run: |
+          cp packer/gitlab-runner.pkrvars.hcl.example packer/ci.pkrvars.hcl
+          packer validate -var-file=packer/ci.pkrvars.hcl packer/
 
   shellcheck:
     runs-on: ubuntu-latest

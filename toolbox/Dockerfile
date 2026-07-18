@@ -41,10 +41,10 @@ RUN set -eux; \
 RUN set -eux; \
     ARCH="$(dpkg --print-architecture)"; \
     curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${ARCH}.zip" -o /tmp/terraform.zip; \
-    unzip -q /tmp/terraform.zip -d /usr/local/bin; \
+    unzip -j /tmp/terraform.zip terraform -d /usr/local/bin; \
     curl -fsSL "https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_${ARCH}.zip" -o /tmp/packer.zip; \
-    unzip -q /tmp/packer.zip -d /usr/local/bin; \
-    rm -f /tmp/terraform.zip /tmp/packer.zip; \
+    unzip -j /tmp/packer.zip packer -d /usr/local/bin; \
+    rm -f /tmp/*.zip; \
     terraform version; \
     packer version; \
     aws --version

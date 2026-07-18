@@ -75,11 +75,11 @@ build {
 
   # Boot-time pre-pull service + its script.
   provisioner "file" {
-    source      = "files/pull-ci-image.sh"
+    source      = "${path.root}/files/pull-ci-image.sh"
     destination = "/tmp/pull-ci-image.sh"
   }
   provisioner "file" {
-    source      = "files/pull-ci-image.service"
+    source      = "${path.root}/files/pull-ci-image.service"
     destination = "/tmp/pull-ci-image.service"
   }
 
@@ -89,6 +89,6 @@ build {
       "CI_IMAGE=${var.ci_image}",
       "SSH_USER=${var.ssh_username}",
     ]
-    script = "scripts/install.sh"
+    script = "${path.root}/scripts/install.sh"
   }
 }

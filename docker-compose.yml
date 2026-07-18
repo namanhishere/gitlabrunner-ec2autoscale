@@ -2,6 +2,7 @@
 #   toolbox - dev container (AWS CLI, Terraform, Packer, Git) for bootstrap,
 #             AMI builds, and Terraform. Uses the host's mounted ~/.aws creds.
 #             Run:  docker compose run --rm toolbox
+#                 gitlabrunner-ec2autoscale-toolbox:local
 #   runner  - the long-running GitLab Runner manager (docker-autoscaler -> EC2).
 #             Run:  docker compose up -d runner
 
@@ -18,7 +19,8 @@ services:
       AWS_REGION: ${AWS_REGION:-eu-west-1}
     volumes:
       - .:/workspace
-      - ${HOME}/.aws:/root/.aws
+      # Un-comment it to use the same ~/.aws with host machine. (Baby, watchin' it burn, send death to isolation)
+      # - ${HOME}/.aws:/root/.aws
     # No restart / no daemon: this is a one-shot interactive shell.
 
   runner:
